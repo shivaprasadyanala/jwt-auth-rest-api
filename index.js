@@ -63,25 +63,26 @@ app.put('/admin/:id', async(req, res) => {
     })
 })
 app.get('/accessResource', (req, res) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.sendStatus(401);
-    //decodering the token
-    const decodedToken = jwt.verify(token, "secretkeyappearshere");
-    if (decodedToken != null) {
-        res.status(200).json({
-            success: true,
-            data: {
-                userId: decodedToken.userId,
-                email: decodedToken.email
-            }
-        })
-    } else {
-        res.sendStatus(403);
-    }
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1]
+        if (token == null) return res.sendStatus(401);
+        //decodering the token
+        const decodedToken = jwt.verify(token, "secretkeyappearshere");
+        if (decodedToken != null) {
+            res.status(200).json({
+                success: true,
+                data: {
+                    userId: decodedToken.userId,
+                    email: decodedToken.email
+                }
+            })
+        } else {
+            res.sendStatus(403);
+        }
 
 
-})
+    })
+    //authentication route
 app.use("/auth", auth);
 mongoose
     .connect("mongodb://localhost:27017/testDB")
