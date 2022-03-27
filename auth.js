@@ -33,10 +33,6 @@ router.post("/signup", async(req, res, next) => {
             const error = new Error("Error! Something went wrong.");
             return next(error);
         }
-        // var token = jwt.sign({
-        //         userId: newUser.id,
-        //         email: newUser.email
-        //     }, "secretkeyappearshere", { expiresIn: 86400 })
         let token;
         try {
             token = jwt.sign({ userId: newUser.id, email: newUser.email },
@@ -86,18 +82,10 @@ router.post('/login', async(req, res) => {
                 email: existinguser.email,
                 token: token,
             },
-            message: "login succesful",
-            accessToken: token,
+            message: "login succesful"
         });
 })
 
-router.get('/accessResource', (req, res) => {
-    const token = req.headers.authorization.split(' ')[1];
-    if (!token) {
-        response.status(200).json({ success: false, message: "Error! Token not provided" });
-    }
-    //decodering the token
-    const decodedToken = jwt.verify(token, "secretkeyappearshere");
-    res.status(200).json({ success: true, data: { userId: decodedToken.user, email: decodedToken.email } })
-})
+
+
 module.exports = router;

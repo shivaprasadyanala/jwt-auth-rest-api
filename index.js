@@ -1,7 +1,7 @@
 PORT = 3000;
 var express = require('express');
 var bodyParser = require('body-parser');
-
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose')
 var app = express();
 app.use(bodyParser.json());
@@ -36,7 +36,6 @@ app.post('/admin/addproducts', async(req, res) => {
         } catch (err) {
             res.status(500).json(err)
         }
-        // res.json({ message: "New product created." });
     })
     //updating the product by admin
 app.put('/admin/:id', async(req, res) => {
@@ -48,17 +47,40 @@ app.put('/admin/:id', async(req, res) => {
     } else {
         res.status(403).json("error while updating");
     }
+
+
+
     //delete a product using the id by admin
     app.delete('/admin/:id', async(req, res) => {
         const { id } = req.params;
         var product = Product.findById(id);
         if (product) {
             await product.deleteOne();
-            res.status(200).json("the post has been updated");
+            res.status(200).json("the post has been deleted");
         } else {
             res.status(403).json("error while deleting");
         }
     })
+})
+app.get('/accessResource', (req, res) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.sendStatus(401);
+    //decodering the token
+    const decodedToken = jwt.verify(token, "secretkeyappearshere");
+    if (decodedToken != null) {
+        res.status(200).json({
+            success: true,
+            data: {
+                userId: decodedToken.userId,
+                email: decodedToken.email
+            }
+        })
+    } else {
+        res.sendStatus(403);
+    }
+
+
 })
 app.use("/auth", auth);
 mongoose
