@@ -3,6 +3,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose')
+const verifytoken = require('./middleware/authJWT')
 var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -15,12 +16,12 @@ const Product = require('./models/productModel.js')
 const auth = require('./auth')
 
 //get all the products
-app.get('/user', async(req, res) => {
+app.get('/user', verifytoken, async(req, res) => {
         const products = await Product.find();
         res.send(products)
     })
     //get the product by user using id
-app.get('/user/:id', async(req, res) => {
+app.get('/user/:id', verifytoken, async(req, res) => {
     const { id } = req.params;
     const product = await Product.findById(id);
     console.log(product);
@@ -49,7 +50,6 @@ app.put('/admin/:id', async(req, res) => {
     }
 
 
-
     //delete a product using the id by admin
     app.delete('/admin/:id', async(req, res) => {
         const { id } = req.params;
@@ -62,7 +62,6 @@ app.put('/admin/:id', async(req, res) => {
         }
     })
 })
-
 
 
 app.use("/auth", auth);

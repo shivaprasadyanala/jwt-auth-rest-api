@@ -1,6 +1,6 @@
 const express = require('express')
 const router = require('express').Router();
-const verifytoken = require('./middleware/authJWT')
+
 var bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -36,7 +36,7 @@ router.post("/signup", async(req, res, next) => {
         let token;
         try {
             token = jwt.sign({ userId: newUser.id, email: newUser.email },
-                "secretkeyappearshere", { expiresIn: "4h" }
+                "secretkeyappearshere", { expiresIn: "10h" }
             )
         } catch (err) {
             const error = new Error("Error! something went wrong");
@@ -52,10 +52,11 @@ router.post("/signup", async(req, res, next) => {
             });
     })
     //user login
-router.post('/login', verifytoken, async(req, res, next) => {
+router.post('/login', async(req, res, next) => {
     let existinguser;
     try {
         existinguser = await User.findOne({ email: req.body.email });
+
         !existinguser && res.status(400).json("user not found");
         const validPassword = await bcrypt.compare(req.body.password, existinguser.password);
         !validPassword && res.status(400).json("invalid password");
@@ -66,13 +67,25 @@ router.post('/login', verifytoken, async(req, res, next) => {
     let token;
     try {
         token = jwt.sign({ userId: existinguser.id, email: existinguser.email },
-            "secretkeyappearshere"
+            "secretkeyappearshere", { expiresIn: "10h" }
         );
+        // console.log(token);
     } catch (err) {
         console.log(err);
         const error = new Error("Error! Something went wrong.");
         return next(error);
     }
+    res
+        .status(201)
+        .json({
+            success: true,
+            data: {
+                userId: existinguser.id,
+                email: existinguser.email,
+                token: token,
+            },
+            message: "login succesful"
+        });
 
 })
 
