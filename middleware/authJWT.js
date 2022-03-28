@@ -10,7 +10,7 @@ const verifytoken = (req, res, next) => {
     //decodering the token
     jwt.verify(token, "secretkeyappearshere", (err, user) => {
             if (err) return res.sendStatus(403)
-                // console.log(user);
+            console.log(user);
             req.user = user
             next()
         })

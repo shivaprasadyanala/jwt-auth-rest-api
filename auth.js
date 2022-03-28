@@ -20,6 +20,7 @@ router.post("/signup", async(req, res, next) => {
         const newUser = new User({
             email: req.body.email,
             name: req.body.name,
+            role: req.body.role,
             password: hashedPassword
         })
 
@@ -33,22 +34,22 @@ router.post("/signup", async(req, res, next) => {
             const error = new Error("Error! Something went wrong.");
             return next(error);
         }
-        let token;
-        try {
-            token = jwt.sign({ userId: newUser.id, email: newUser.email },
-                "secretkeyappearshere", { expiresIn: "10h" }
-            )
-        } catch (err) {
-            const error = new Error("Error! something went wrong");
-            return next(error);
-        }
+        // let token;
+        // try {
+        //     token = jwt.sign({ userId: newUser.id, email: newUser.email },
+        //         "secretkeyappearshere", { expiresIn: "10h" }
+        //     )
+        // } catch (err) {
+        //     const error = new Error("Error! something went wrong");
+        //     return next(error);
+        // }
         res
             .status(201)
             .json({
                 success: true,
-                data: { userId: newUser.id, email: newUser.email, token: token },
+                data: { userId: newUser.id, email: newUser.email, role: newUser.role },
                 message: "signup succesful",
-                accessToken: token,
+                // accessToken: token,
             });
     })
     //user login
@@ -66,7 +67,7 @@ router.post('/login', async(req, res, next) => {
     }
     let token;
     try {
-        token = jwt.sign({ userId: existinguser.id, email: existinguser.email },
+        token = jwt.sign({ userId: existinguser.id, role: existinguser.role },
             "secretkeyappearshere", { expiresIn: "10h" }
         );
         // console.log(token);
@@ -82,7 +83,9 @@ router.post('/login', async(req, res, next) => {
             data: {
                 userId: existinguser.id,
                 email: existinguser.email,
+                role: existinguser.role,
                 token: token,
+
             },
             message: "login succesful"
         });
